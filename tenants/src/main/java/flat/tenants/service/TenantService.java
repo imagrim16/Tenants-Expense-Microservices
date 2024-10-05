@@ -16,7 +16,7 @@ public class TenantService {
     @Autowired
     private TenantRepository repository;
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(TenantService.class);
 
     public Tenant addNewTenant(Tenant tenant) {
         log.info("Adding the Tenant");
