@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>flat</groupId>
-	<artifactId>tenants</artifactId>
+	<artifactId>expense</artifactId>
 	<version>1.0.0</version>
-	<name>Tenants Entity</name>
+	<name>expense</name>
 	<description>Tenants expenses tracker app</description>
 	<url/>
 	<licenses>
@@ -60,8 +60,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>

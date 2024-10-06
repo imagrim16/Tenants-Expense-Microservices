@@ -34,4 +34,8 @@ public class TenantService {
          log.info("Deleting Tenant By ID");
          return deleted;
     }
+
+    public String getTotaltenants() {
+        return String.valueOf(this.repository.count());
+    }
 }
