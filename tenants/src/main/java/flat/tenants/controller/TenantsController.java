@@ -18,14 +18,23 @@ public class TenantsController {
         return this.service.addNewTenant(tenant);
     }
 
+    //Get Tenant
     @GetMapping("/{id}")
     public Tenant getTenantById(@PathVariable Integer id){
         return this.service.getTenantById(id);
     }
 
+    //Delete Tenant
     @DeleteMapping("/{id}")
     public Tenant deleteById(@PathVariable Integer id)
     {
         return this.service.deleteTenantById(id);
+    }
+
+    //get Count
+    @GetMapping("/count")
+    public String getCount()
+    {
+        return this.service.getTotaltenants();
     }
 }
