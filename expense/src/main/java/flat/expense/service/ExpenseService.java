@@ -26,8 +26,6 @@ public class ExpenseService {
             logger.info("Exception !!! date is null ");
             throw new ExpenseMandatoryDateException("Date is mandatory for adding an expense!");
         }
-
-        expenseTypes.setTotalExpense(); // Calculate total expense before saving
         this.repository.save(expenseTypes); // Save the expense types
     }
 

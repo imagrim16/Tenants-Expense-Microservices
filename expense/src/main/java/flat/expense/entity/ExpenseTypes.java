@@ -1,6 +1,5 @@
 package flat.expense.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -11,40 +10,41 @@ import java.time.LocalDate;
 @Data
 @Entity
 public class ExpenseTypes {
+
     @Id
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfExpense;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long rent;
+    private Long rent = 0L;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long groceries;
+    private Long groceries = 0L;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long cook;
+    private Long cook = 0L;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long washingMachine;
+    private Long washingMachine = 0L;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long totalExpense;
+    private Long totalExpense = 0L;
 
-    //setting the default values
+    private Long electricity = 0L;
+    private Long broadband = 0L;
+
+    // Default constructor
     public ExpenseTypes() {
-        this.rent = 0L;
-        this.groceries = 0L;
-        this.cook = 0L;
-        this.washingMachine = 0L;
-        this.totalExpense = 0L;  // Optional, will be recalculated
+        // All Long fields are initialized to zero by default
     }
 
-    public void setTotalExpense(){
-        this.totalExpense=cook+rent+groceries+washingMachine;
+    // Method to calculate total expenses
+    public void calculateTotalExpense() {
+        this.totalExpense = rent + groceries + cook + washingMachine + electricity + broadband;
     }
+
     @PrePersist
     @PreUpdate
     private void updateTotalExpenseBeforeSave() {
-        setTotalExpense();
+        calculateTotalExpense();
     }
 }
