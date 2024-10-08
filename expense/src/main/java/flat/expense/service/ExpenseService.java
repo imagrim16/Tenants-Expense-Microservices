@@ -26,12 +26,12 @@ public class ExpenseService {
             logger.info("Exception !!! date is null ");
             throw new ExpenseMandatoryDateException("Date is mandatory for adding an expense!");
         }
-
-        expenseTypes.setTotalExpense(); // Calculate total expense before saving
         this.repository.save(expenseTypes); // Save the expense types
     }
 
     public ExpenseTypes getExpenseByDate(LocalDate date) {
+        logger.info("Hiiting the Get Expense Service URL");
+        logger.info(this.repository.findById(date).toString());
         return this.repository.findById(date)
                 .orElseThrow(() -> new ExpenseNotFoundException("Expense not found for date: " + date));
     }
@@ -56,10 +56,7 @@ public class ExpenseService {
         existingExpense.setCook(defaultIfNull(updatedExpense.getCook(), existingExpense.getCook()));
         existingExpense.setWashingMachine(defaultIfNull(updatedExpense.getWashingMachine(), existingExpense.getWashingMachine()));
 
-        // Recalculate the total expense
-     //   existingExpense.setTotalExpense();
-
-        // Save and return the updated entity
+        logger.info("Updating the Expense for date : "+date);
         return repository.save(existingExpense);
     }
 
