@@ -24,28 +24,33 @@ public class ExpenseController {
         this.service.addExpenseTypes(expenseTypes);
         return "Expense Added Successfully";
     }
+
     //Get Expenses By date
     @GetMapping("/getByDate/{date}")
     public ExpenseTypes getExpense(@PathVariable LocalDate date)
     {
        return this.service.getExpenseByDate(date);
     }
+
     //Get expense By month
     @GetMapping("/getByMonth/{month}")
     public List<ExpenseTypes> getExpenseByMonth(@PathVariable Integer month)
     {
         return this.service.getExpenseByMonth(month);
     }
+
     //Modifying the expense
     @PatchMapping("/update/{date}")
     public ExpenseTypes modifyExpenses(@RequestBody ExpenseTypes updatedExpenses, @PathVariable LocalDate date){
         return this.service.updateExpense(updatedExpenses,date);
     }
+
     //Get Total Expenses of the Month
     @GetMapping("/total/{month}")
     public Long getTotal(@PathVariable Integer month) {
        return this.service.getTotal(month);
     }
+
     // Delete Expense By date
     @DeleteMapping("/delete/{date}")
     public String deleteExpenseByDate(@PathVariable LocalDate date){
