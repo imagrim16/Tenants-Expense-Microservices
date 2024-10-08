@@ -1,7 +1,11 @@
 spring:
   application:
-    name: Individual Expense
-
+    name: individual-expense-service
+  cloud:
+    discovery:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/
 #Server Configuration
 server:
   port: 8083
@@ -11,7 +15,8 @@ server:
 expense:
   service:
     url:
-      base: "http://localhost:8082/expense/"
+     #base: "http://localhost:8082/expense/"
+      base: "http://expense-service/expense/"
       getByDate: "getByDate/"
 
 # noinspection undefined
@@ -20,5 +25,13 @@ expense:
 tenant:
   service:
     url :
-      base: "http://localhost:8081/tenant/"
+      #base: "http://localhost:8081/tenant/"
+      base: "http://tenant-service/tenant/"
       count: "count"
+
+#Eureka Configurations
+logging:
+  level:
+    com.netflix.eureka: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG
+    org.springframework.cloud.client.discovery: DEBUG

@@ -1,7 +1,11 @@
 spring:
   application:
-    name: Tenants Entity
-
+    name: tenant-service
+  cloud:
+    discovery:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/
   datasource:
     url: jdbc:mysql://localhost:3306/tenant?useSSL=false&allowPublicKeyRetrieval=true
     username: root
@@ -12,5 +16,15 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health
+
+
 server:
   port: 8081
+

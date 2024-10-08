@@ -73,10 +73,10 @@ public class IndividualExpensiveService {
                     log.info("Tenant data merged successfully: {}", tenantMap);
                     return Mono.just(individualTenantExpense); // Return the populated object
                 })
-                .onErrorMap(error -> new ExpenseMapException("Failed to fetch tenant expense", error)) // Map any other errors
+                .onErrorMap(error -> new ExpenseMapException("Failed to fetch tenant EXPENSE", error)) // Map any other errors
                 .onErrorMap(
                         WebClientRequestException.class, // Catch network-related errors
-                        ex -> new MicroserviceNotAvailableException("Microservice Expense is not available")
+                        ex -> new MicroserviceNotAvailableException("Microservice Expense is not available !!!")
                 )
                 .block(); // This will block and wait for the result
     }
