@@ -1,6 +1,14 @@
 spring:
   application:
-    name: Individual Expense
+    name: individual-expense-service
+  cloud:
+    discovery:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/
+
+
+
 
 #Server Configuration
 server:
@@ -12,6 +20,7 @@ expense:
   service:
     url:
       base: "http://localhost:8082/expense/"
+      #base: "http://expense-service/expense/"
       getByDate: "getByDate/"
 
 # noinspection undefined
@@ -22,3 +31,5 @@ tenant:
     url :
       base: "http://localhost:8081/tenant/"
       count: "count"
+
+#Eureka Configurations

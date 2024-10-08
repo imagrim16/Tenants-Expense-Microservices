@@ -1,7 +1,12 @@
 spring:
   application:
-    name: Tenants Entity
-
+    name: expense-service
+  cloud:
+    discovery:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/
+          
   datasource:
     url: jdbc:mysql://localhost:3306/tenant?useSSL=false&allowPublicKeyRetrieval=true
     username: root
@@ -14,3 +19,5 @@ spring:
     show-sql: true
 server:
   port: 8082
+
+
