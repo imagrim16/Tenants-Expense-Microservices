@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>flat</groupId>
 	<artifactId>individual-expense</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>individual-expense</name>
 	<description>Tenants expenses tracker app</description>
 	<url/>
