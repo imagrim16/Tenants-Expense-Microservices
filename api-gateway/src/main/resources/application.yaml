@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        # Route for expense service
+        - id: expense-service
+          uri: lb://expense-service
+          predicates:
+            - Path=/expense/**
+
+        # Route for tenant service
+        - id: tenant-service
+          uri: lb://tenant-service
+          predicates:
+            - Path=/tenant/**
+
+        # Route for individual expense service
+        - id: individual-expense-service
+          uri: lb://individual-expense-service
+          predicates:
+            - Path=/individual/expense/**
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
+        web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"   # Expose all actuator endpoints
+  info:
+    app:
+      name: api-gateway
+      description: API Gateway for microservices
+      version: 1.0.0
+    build:
+      enabled: true  # If you configured the build information
