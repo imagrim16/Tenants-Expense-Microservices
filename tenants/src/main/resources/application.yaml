@@ -6,6 +6,14 @@ spring:
       client:
         service-url:
           defaultZone: http://localhost:8761/eureka/
+# configuartion for fetching the value from config server
+  # Optional one
+#  config:
+#    import: optional:configserver:http://localhost:8084
+#  config:
+#    import:
+#      - configserver:http://localhost:8084
+
   datasource:
     url: jdbc:mysql://localhost:3306/tenant?useSSL=false&allowPublicKeyRetrieval=true
     username: root
@@ -22,9 +30,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: info, health
-
-
+        include: '*'
+  info:
+    env:
+      enabled: true
 server:
   port: 8081
-
+logging:
+  level:
+    org.springframework.cloud: DEBUG
