@@ -1,0 +1,40 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/imagrim16/Tenants-Expense-Microservices
+          clone-on-start: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health
+  info:
+    env:
+      enabled: true
+info:
+  application:
+    name: Config Server
+    Description : Config Server for common registration with Eureka
+
+# loggers
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud: INFO
+    org.springframework.boot.actuate: INFO
+    org.springframework.web: DEBUG  # Optional: Change to DEBUG for more detailed logs
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8086/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip: true
