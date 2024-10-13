@@ -1,12 +1,13 @@
 package flat.tenants.controller;
 
+import flat.tenants.entity.Miscellaneous;
 import flat.tenants.entity.Tenant;
 import flat.tenants.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("tenant/")
+@RequestMapping("/tenant")
 public class TenantsController {
 
     @Autowired
@@ -35,6 +36,20 @@ public class TenantsController {
     @GetMapping("/count")
     public String getCount()
     {
-        return this.service.getTotaltenants();
+        return this.service.getTotalTenants();
+    }
+
+    //Set Misc for an Entity
+    @PostMapping("/misc/{id}")
+    public String addMisc(@PathVariable Integer id, @RequestBody Miscellaneous misc){
+        return this.service.addMiscData(id,misc)? "Misc data added successfully"
+                :"There is some error, please check the logs !!! ";
+    }
+
+    //deleting the misc data
+    @DeleteMapping("/misc/{id}")
+    public String deleteMisc(@PathVariable Integer id, @RequestBody Miscellaneous misc){
+        return this.service.deleteMiscData(id,misc)? "Misc data deleted successfully"
+                :"No Misc data found with the given input !!! ";
     }
 }
