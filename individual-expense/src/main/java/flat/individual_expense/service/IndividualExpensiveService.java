@@ -1,17 +1,20 @@
 package flat.individual_expense.service;
 
 import flat.individual_expense.entity.IndividualTenantExpense;
+import flat.individual_expense.entity.MiscellaneousDTO;
 import flat.individual_expense.exception.ExpenseMapException;
 import flat.individual_expense.exception.MicroserviceNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,6 +32,9 @@ public class IndividualExpensiveService {
     @Value("${tenant.service.url.count}")
     private String TENANT_GET_COUNT;
 
+    @Value("${tenant.service.url.get.by.date}")
+    private String TENANT_GET_MISC_BY_DATE;
+
     private final WebClient webClient;
 
     private static final Logger log = LoggerFactory.getLogger(IndividualExpensiveService.class);
@@ -37,7 +43,7 @@ public class IndividualExpensiveService {
         this.webClient = webClientBuilder.build(); // Set the base URL for expense service
     }
 
-    public IndividualTenantExpense getMonthlyExpense(LocalDate date) {
+    public IndividualTenantExpense getMonthlyExpense(Integer id, LocalDate date) {
         String tenantServiceUrl = EXPENSE_SERVICE_BASE_URL+EXPENSE_GET_BY_DATE_URL + date; // Construct the URL based on the date
         IndividualTenantExpense individualTenantExpense = new IndividualTenantExpense();
 
@@ -115,4 +121,28 @@ public class IndividualExpensiveService {
     public void addMiscIndividualExpense(Long misc) {
         // Implement logic to add miscellaneous expense
     }
+
+    public List<MiscellaneousDTO> getMiscData(Integer id) {
+        String miscServiceUrl = TENANT_SERVICE_BASE_URL + TENANT_GET_MISC_BY_DATE + id; // Construct the URL
+
+        return webClient.get()
+                .uri(miscServiceUrl)
+                .retrieve()
+                .onStatus(
+                        status -> !status.is2xxSuccessful(),
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    String errorMessage = String.format("Error fetching miscellaneous data for ID %d: %s", id, errorBody);
+                                    return Mono.error(new RuntimeException(errorMessage)); // Log the error or use a custom exception
+                                })
+                )
+                .bodyToMono(new ParameterizedTypeReference<List<MiscellaneousDTO>>() {}) // Convert the response body to a List of MiscellaneousDTO
+                .onErrorMap(
+                        WebClientRequestException.class, // Catch network-related errors
+                        ex -> new RuntimeException("Microservice for Miscellaneous data is not available!", ex) // Handle the exception
+                )
+                .block(); // Block to wait for the result and return the List
+    }
+
 }
+

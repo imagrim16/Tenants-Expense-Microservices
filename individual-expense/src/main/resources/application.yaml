@@ -28,7 +28,9 @@ tenant:
       #base: "http://localhost:8081/tenant/"
       base: "http://tenant-service/tenant/"
       count: "count"
-
+      get :
+        by :
+          date : "misc/"
 #Eureka Configurations
 logging:
   level:
