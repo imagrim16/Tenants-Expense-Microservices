@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -67,5 +68,10 @@ public class TenantService {
 
         log.info("No Misc data found with the given input !!!");
         return false;
+    }
+
+    public List<Miscellaneous> getMiscDataList(Integer id) {
+        log.info("Fetching the Misc Data from DB ...");
+        return this.getTenantById(id).getMisc();
     }
 }
