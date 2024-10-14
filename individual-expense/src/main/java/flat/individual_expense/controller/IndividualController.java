@@ -27,9 +27,9 @@ public class IndividualController {
        return this.service.getMonthlyExpense(id,date);
 
     }
-    @GetMapping("/misc/{id}")
-    public Mono<List<MiscellaneousDTO>> getMisc(@PathVariable Integer id){
-       return this.service.getMiscData(id);
+    @GetMapping("/misc/{id}/{month}")
+    public Mono<List<MiscellaneousDTO>> getMisc(@PathVariable Integer id,@PathVariable(name = "month")Integer month){
+       return this.service.getMiscData(id,month);
     }
 
 }

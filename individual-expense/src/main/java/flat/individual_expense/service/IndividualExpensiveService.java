@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class IndividualExpensiveService {
@@ -76,7 +77,7 @@ public class IndividualExpensiveService {
                                 individualTenantExpense.setElectricity(convertToLong(tenantMap.get("electricity"), numberOfTenants));
 
                                 // Get miscellaneous data reactively
-                                return getMiscData(id)
+                                return getMiscData(id, LocalDate.now().getMonthValue())
                                         .flatMap(miscDataList -> {
                                             // Set miscellaneous data
                                             individualTenantExpense.setMisc(miscDataList);
@@ -131,7 +132,7 @@ public class IndividualExpensiveService {
         // Implement logic to add miscellaneous expense
     }
 
-    public Mono<List<MiscellaneousDTO>> getMiscData(Integer id) {
+    public Mono<List<MiscellaneousDTO>> getMiscData(Integer id, Integer month) {
         String miscServiceUrl = TENANT_SERVICE_BASE_URL + TENANT_GET_MISC_BY_DATE + id; // Construct the URL
 
         return webClient.get()
@@ -149,8 +150,18 @@ public class IndividualExpensiveService {
                 .onErrorMap(
                         WebClientRequestException.class, // Catch network-related errors
                         ex -> new RuntimeException("Microservice for Miscellaneous data is not available!", ex) // Handle the exception
-                );
+                )
+                .map(miscData -> filterByMonth(miscData, month)); // Filter the data by month
     }
 
+    private List<MiscellaneousDTO> filterByMonth(List<MiscellaneousDTO> miscData, Integer month) {
+        return miscData.stream()
+                .filter(item -> {
+                    // Assuming MiscellaneousDTO has a LocalDate field named 'dateField' to compare with
+                    LocalDate dateField = item.getExpenseDate(); // Replace with actual method to get the date
+                    return dateField != null && dateField.getMonthValue() == month;
+                })
+                .collect(Collectors.toList());
+    }
 }
 
