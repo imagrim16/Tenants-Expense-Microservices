@@ -3,9 +3,13 @@ package flat.tenants.controller;
 import flat.tenants.entity.Miscellaneous;
 import flat.tenants.entity.Tenant;
 import flat.tenants.service.TenantService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/tenant")
 public class TenantsController {
@@ -52,4 +56,12 @@ public class TenantsController {
         return this.service.deleteMiscData(id,misc)? "Misc data deleted successfully"
                 :"No Misc data found with the given input !!! ";
     }
+
+    //Getting misc data
+    @GetMapping("/misc/{id}")
+    public List<Miscellaneous> getMisc(@PathVariable Integer id){
+        log.info("Fetching the Misc data from db...");
+        return this.service.getMiscDataList(id);
+    }
+
 }

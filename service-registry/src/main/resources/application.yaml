@@ -3,7 +3,10 @@ spring:
     name: service-registry
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    registerWithEureka: false
+    fetchRegistry: false
 server:
   port: 8761
+logging:
+  level:
+    com.netflix.eureka: DEBUG
