@@ -43,55 +43,64 @@ public class IndividualExpensiveService {
         this.webClient = webClientBuilder.build(); // Set the base URL for expense service
     }
 
-    public IndividualTenantExpense getMonthlyExpense(Integer id, LocalDate date) {
-        String tenantServiceUrl = EXPENSE_SERVICE_BASE_URL+EXPENSE_GET_BY_DATE_URL + date; // Construct the URL based on the date
+    public Mono<IndividualTenantExpense> getMonthlyExpense(Integer id, LocalDate date) {
+        String tenantServiceUrl = EXPENSE_SERVICE_BASE_URL + EXPENSE_GET_BY_DATE_URL + date; // Construct the URL based on the date
         IndividualTenantExpense individualTenantExpense = new IndividualTenantExpense();
 
-        Long numberOfTenants = getNumberOfTenant(); // Fetch the number of tenants
-        // If no tenants were found then it will throw an exception
-        if(numberOfTenants==0L)
-            throw new ArithmeticException();
-        return webClient.get()
-                .uri(tenantServiceUrl) // Append tenant ID to URL
-                .retrieve()
-                .onStatus(
-                        status -> !status.is2xxSuccessful(),
-                        clientResponse -> clientResponse.bodyToMono(String.class)
-                                .flatMap(errorBody -> {
-                                    String errorMessage = String.format("Error fetching tenant data: %s", errorBody);
-                                    log.error(errorMessage); // Log the error
-                                    return Mono.error(new ExpenseMapException(errorMessage));
-                                })
-                )
-                .bodyToMono(Map.class)
-                .flatMap(tenantMap -> {
-                    // Merge tenant data into the individualTenantExpense entity
-                    individualTenantExpense.setCook(convertToLong(tenantMap.get("cook"), numberOfTenants));
-                    individualTenantExpense.setWashingMachine(convertToLong(tenantMap.get("washingMachine"), numberOfTenants));
-                    individualTenantExpense.setRent(convertToLong(tenantMap.get("rent"), numberOfTenants));
-                    individualTenantExpense.setGroceries(convertToLong(tenantMap.get("groceries"), numberOfTenants));
-                    individualTenantExpense.setBroadband(convertToLong(tenantMap.get("broadband"), numberOfTenants));
-                    individualTenantExpense.setElectricity(convertToLong(tenantMap.get("electricity"), numberOfTenants));
+        return getNumberOfTenant()
+                .flatMap(numberOfTenants -> {
+                    if (numberOfTenants == 0L) {
+                        return Mono.error(new ArithmeticException("No Tenants were Found"));
+                    }
 
-                    // Calculate total expense after merging
-                    individualTenantExpense.calculateTotal();
+                    return webClient.get()
+                            .uri(tenantServiceUrl) // Append tenant ID to URL
+                            .retrieve()
+                            .onStatus(
+                                    status -> !status.is2xxSuccessful(),
+                                    clientResponse -> clientResponse.bodyToMono(String.class)
+                                            .flatMap(errorBody -> {
+                                                String errorMessage = String.format("Error fetching tenant data: %s", errorBody);
+                                                log.error(errorMessage); // Log the error
+                                                return Mono.error(new ExpenseMapException(errorMessage));
+                                            })
+                            )
+                            .bodyToMono(Map.class)
+                            .flatMap(tenantMap -> {
+                                // Merge tenant data into the individualTenantExpense entity
+                                individualTenantExpense.setCook(convertToLong(tenantMap.get("cook"), numberOfTenants));
+                                individualTenantExpense.setWashingMachine(convertToLong(tenantMap.get("washingMachine"), numberOfTenants));
+                                individualTenantExpense.setRent(convertToLong(tenantMap.get("rent"), numberOfTenants));
+                                individualTenantExpense.setGroceries(convertToLong(tenantMap.get("groceries"), numberOfTenants));
+                                individualTenantExpense.setBroadband(convertToLong(tenantMap.get("broadband"), numberOfTenants));
+                                individualTenantExpense.setElectricity(convertToLong(tenantMap.get("electricity"), numberOfTenants));
 
-                    log.info("Tenant data merged successfully: {}", tenantMap);
-                    return Mono.just(individualTenantExpense); // Return the populated object
-                })
-                .onErrorMap(error -> new ExpenseMapException("Failed to fetch tenant EXPENSE", error)) // Map any other errors
-                .onErrorMap(
-                        WebClientRequestException.class, // Catch network-related errors
-                        ex -> new MicroserviceNotAvailableException("Microservice Expense is not available !!!")
-                )
-                .block(); // This will block and wait for the result
+                                // Get miscellaneous data reactively
+                                return getMiscData(id)
+                                        .flatMap(miscDataList -> {
+                                            // Set miscellaneous data
+                                            individualTenantExpense.setMisc(miscDataList);
+
+                                            // Calculate total expense after merging
+                                            individualTenantExpense.calculateTotal(); // Now calls calculateTotal without parameters
+                                            log.info("Tenant data merged successfully: {}", tenantMap);
+                                            return Mono.just(individualTenantExpense); // Return the populated object
+                                        });
+                            })
+                            .onErrorMap(error -> new ExpenseMapException("Failed to fetch tenant EXPENSE", error))
+                            .onErrorMap(
+                                    WebClientRequestException.class, // Catch network-related errors
+                                    ex -> new MicroserviceNotAvailableException("Microservice Expense is not available !!!")
+                            );
+                });
     }
+
 
     private Long convertToLong(Object value, Long numberOfTenants) {
         return value instanceof Number ? ((Number) value).longValue() / numberOfTenants : 0L; // Default to 0L if not a number
     }
 
-    private Long getNumberOfTenant() {
+    private Mono<Long> getNumberOfTenant() {
         String tenantCountUrl = TENANT_SERVICE_BASE_URL + TENANT_GET_COUNT;
 
         return webClient.get()
@@ -111,9 +120,9 @@ public class IndividualExpensiveService {
                         return 0L; // Default to 0L if parsing fails
                     }
                 })
-                .defaultIfEmpty(0L)
-                .block(); // Block to return a Long
+                .defaultIfEmpty(0L); // Return 0L if nothing is found
     }
+
 
 
 
@@ -122,7 +131,7 @@ public class IndividualExpensiveService {
         // Implement logic to add miscellaneous expense
     }
 
-    public List<MiscellaneousDTO> getMiscData(Integer id) {
+    public Mono<List<MiscellaneousDTO>> getMiscData(Integer id) {
         String miscServiceUrl = TENANT_SERVICE_BASE_URL + TENANT_GET_MISC_BY_DATE + id; // Construct the URL
 
         return webClient.get()
@@ -140,8 +149,7 @@ public class IndividualExpensiveService {
                 .onErrorMap(
                         WebClientRequestException.class, // Catch network-related errors
                         ex -> new RuntimeException("Microservice for Miscellaneous data is not available!", ex) // Handle the exception
-                )
-                .block(); // Block to wait for the result and return the List
+                );
     }
 
 }
