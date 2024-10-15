@@ -1,1 +1,18 @@
 
+#Eureka Client Configuration
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+#    register-with-eureka: false
+#    fetch-registry: true
+#  instance:
+#    prefer-ip: true
+# loggers
+logging:
+  level:
+    root: INFO                     # Default logging level
+    org.springframework.cloud: INFO   # Spring Cloud logging (including Eureka)
+    org.springframework.web: DEBUG    # Spring MVC logging
+    com.netflix.eureka: DEBUG        # Eureka client-specific logging
+

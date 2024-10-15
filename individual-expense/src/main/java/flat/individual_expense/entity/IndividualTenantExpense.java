@@ -1,9 +1,8 @@
 package flat.individual_expense.entity;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
+
+import java.util.List;
 
 @Data
 public class IndividualTenantExpense {
@@ -14,11 +13,15 @@ public class IndividualTenantExpense {
     private Long groceries = 0L;
     private Long broadband = 0L;
     private Long electricity = 0L;
-    private Long misc = 0L;
+    private List<MiscellaneousDTO> misc; // List of MiscellaneousDTO
     private Long total = 0L;
 
     public void calculateTotal() {
-        this.total = cook + washingMachine + rent + groceries + broadband + electricity + misc;
-    }
+        // Calculate total based on all fields, including the misc list
+        Long miscTotal = misc != null ? misc.stream()
+                .map(MiscellaneousDTO::getValue) // Assuming getValue returns Long
+                .reduce(0L, Long::sum) : 0L;
 
+        this.total = cook + washingMachine + rent + groceries + broadband + electricity + miscTotal;
+    }
 }

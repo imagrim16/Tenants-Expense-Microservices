@@ -42,7 +42,9 @@ public class ExpenseService {
                 Integer.valueOf(expenseTypes.getDateOfExpense().toString().substring(5,7))
                         .equals(month)).collect(Collectors.toList());
         ;
-        logger.info("Get all Expenses in a Month :");
+        logger.info("Get all Expenses in a Month :{}",result);
+        if(result.isEmpty())
+            throw new ExpenseNotFoundException("Expense not found for month : "+month);
         for(ExpenseTypes types:result) logger.info(String.valueOf(types));
         return result;
     }
