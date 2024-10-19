@@ -59,8 +59,8 @@ management:
 # Okta configuration
 okta:
   oauth2:
-    issuer: https://dev-65653658.okta.com/oauth2/default
-    audience: api://default
-    client-id: 0oakf01xk2C4ctfL15d7
-    client-secret: 2v2CWXIeNCKqD8_WIBNW8qgZddwdWdU-IM9onRxNTIFIXcbAI5F6Hzs8LlLN4tRr
+    issuer:
+    audience:
+    client-id:
+    client-secret: 
     scopes: openid,profile,email,offline_access
